@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_assessment_app/features/home/presentation/main_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
-
-// This provider is overridden in main.dart with the pre-calculated state
 final initialAuthStateProvider = Provider<bool>((ref) {
   return false; 
 });

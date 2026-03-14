@@ -14,15 +14,12 @@ class AuthService {
     required String username,
     required String birthday,
   }) async {
-    // 1. Create Firebase Auth User
     final userCredential = await _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
 
     final uid = userCredential.user!.uid;
-
-    // 2. Save to Firestore
     await _firestore.collection('users').doc(uid).set({
       'uid': uid,
       'email': email,
@@ -30,8 +27,6 @@ class AuthService {
       'birthday': birthday,
       'createdAt': FieldValue.serverTimestamp(),
     });
-
-    // 3. Cache locally in Isar
     await _isarService.saveUserLocally(UserLocalModel(
       uid: uid,
       email: email,
@@ -52,14 +47,10 @@ class AuthService {
         password: password,
       );
       final uid = userCredential.user!.uid;
-
-      // Fetch user data from Firestore
       final userDoc = await _firestore.collection('users').doc(uid).get();
       final data = userDoc.data();
 
-      if (data != null) {
-        // Cache locally in Isar
-        await _isarService.saveUserLocally(UserLocalModel(
+      if (data != null) {await _isarService.saveUserLocally(UserLocalModel(
           uid: uid,
           email: data['email'] ?? '',
           username: data['username'] ?? '',
@@ -70,12 +61,9 @@ class AuthService {
       return userCredential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'network-request-failed') {
-        // Fallback to Isar
         final cachedUser = await _isarService.getUser();
         if (cachedUser != null && cachedUser.email == email) {
-          // In a real app, you might want to verify password hash here
-          // But for this assessment, finding the user in Isar with matching email is enough for offline access
-          return null; // Return null to indicate offline success (since we can't create UserCredential)
+          return null;
         }
       }
       rethrow;

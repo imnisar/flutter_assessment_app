@@ -202,8 +202,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     
     bool isLoading = formState.isLoading;
 
-    final Color activeColor1 = const Color(0xFF0079FF);
-    final Color activeColor2 = const Color(0xFF004DFF);
+    const Color activeColor1 = Color(0xFF0079FF);
+    const Color activeColor2 = Color(0xFF004DFF);
     final double textScale = MediaQuery.textScalerOf(context).scale(1.0);
 
     return GestureDetector(

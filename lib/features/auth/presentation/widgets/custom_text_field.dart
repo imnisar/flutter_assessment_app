@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_assessment_app/core/constants/app_images.dart';
-import 'package:flutter_assessment_app/core/extensions/size_extension.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_fonts.dart';
 

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_assessment_app/core/extensions/size_extension.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,19 +23,30 @@ class ShopScreen extends ConsumerWidget {
           NotificationListener<ScrollNotification>(
             onNotification: (notification) {
               if (notification is ScrollUpdateNotification) {
+                final pixels = notification.metrics.pixels;
                 Future.microtask(() {
-                  ref
-                      .read(shopProvider.notifier)
-                      .updateScroll(notification.metrics.pixels);
+                  ref.read(shopProvider.notifier).updateScroll(pixels);
                 });
+                if (pixels < -120) {
+                  HapticFeedback.mediumImpact();
+                }
               }
               return true;
             },
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(
+                    height: 70.h,
+                  ),
                   _buildTabs(context, ref, state),
+                  SizedBox(
+                    height: 40.h,
+                  ),
                   _buildFeaturedSection(ref, state),
                   const SizedBox(height: 10),
                   const Padding(
@@ -93,7 +105,9 @@ class ShopScreen extends ConsumerWidget {
                     ref,
                     state,
                   ),
-                  SizedBox(height: 8.h,),
+                  SizedBox(
+                    height: 8.h,
+                  ),
                   _buildPromotionSection(),
                   const SizedBox(height: 70),
                 ],
@@ -111,7 +125,8 @@ class ShopScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildGlassHeader(BuildContext context, WidgetRef ref, ShopState state) {
+  Widget _buildGlassHeader(
+      BuildContext context, WidgetRef ref, ShopState state) {
     return SafeArea(
       bottom: false,
       child: Column(
@@ -119,11 +134,32 @@ class ShopScreen extends ConsumerWidget {
         children: [
           const SizedBox(height: 65),
           _buildSearchBar(context),
+          ClipRect(
+            child: AnimatedAlign(
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeOutQuart,
+              alignment: Alignment.topCenter,
+              heightFactor:
+                  (state.isTagsVisible ? 1.0 : state.pullDownPercentage)
+                      .clamp(0.0, 1.0),
+              child: Opacity(
+                opacity: (state.isTagsVisible ? 1.0 : state.pullDownPercentage)
+                    .clamp(0.0, 1.0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 15),
+                    _buildCategoryTags(context),
+                  ],
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 20),
         ],
       ),
     );
   }
+
   Widget _buildTabs(BuildContext context, WidgetRef ref, ShopState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -160,6 +196,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildBackgroundLine() {
     return Container(
       height: 2,
@@ -177,6 +214,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildActiveIndicator() {
     return Container(
       height: 2,
@@ -185,6 +223,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildTab(String title, bool isActive, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
@@ -208,6 +247,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -246,9 +286,10 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildFeaturedSection(WidgetRef ref, ShopState state) {
     return SizedBox(
-      height: 420.h,
+      height: 500.h,
       child: PageView(
         onPageChanged: ref.read(shopProvider.notifier).setFeaturedIndex,
         children: [
@@ -264,76 +305,86 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildFeaturedCard(
       String title, String desc, Color bgColor, String imageUrl, bool isFirst) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(35),
+                ),
+                child: Image(
+                  image: imageUrl.startsWith('http')
+                      ? NetworkImage(imageUrl)
+                      : AssetImage(imageUrl) as ImageProvider,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(title,
+                style:  TextStyle(
+                    fontFamily: AppFonts.poppins,
+                    fontSize: 30.h,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.black)),
+            const SizedBox(height: 5),
+            Text(
+              desc,
+              style: const TextStyle(
+                fontFamily: AppFonts.dmSans,
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF3F3636),
+              ),
+            ),
+            SizedBox(height: 20.h),
+            buildShopNowButton("Shop Now", () {}),
+            SizedBox(height: 10.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: buildDotIndicator(
+                  isFirst ? 0 : -1),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrendingBrandsContent() {
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 1.3,
-            child: Container(
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(35),
+          _buildTrendingBrands(),
+          const SizedBox(height: 15),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(child: _buildGlobalScene()),
+              Padding(
+                padding: const EdgeInsets.only(right: 20, bottom: 20),
+                child: buildDotIndicator(1),
               ),
-              child: Image(
-                image: imageUrl.startsWith('http')
-                    ? NetworkImage(imageUrl)
-                    : AssetImage(imageUrl) as ImageProvider,
-                fit: BoxFit.cover,
-                alignment: Alignment.topCenter,
-              ),
-            ),
-          ),
-          SizedBox(height: 8.h),
-          Text(title,
-              style: const TextStyle(
-                  fontFamily: AppFonts.poppins,
-                  fontSize: 35,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black)),
-          const SizedBox(height: 5),
-          Text(
-            desc,
-            style: const TextStyle(
-              fontFamily: AppFonts.dmSans,
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF3F3636),
-            ),
-          ),
-          SizedBox(height: 20.h),
-          buildShopNowButton("Shop Now", () {}),
-          SizedBox(height: 10.h),
-          Align(
-            alignment: Alignment.centerRight,
-            child: buildDotIndicator(isFirst ? 0 : -1), // Only shows first dot if on first page
+            ],
           ),
         ],
       ),
     );
   }
-  Widget _buildTrendingBrandsContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildTrendingBrands(),
-        const Spacer(),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: _buildGlobalScene()),
-            Padding(
-              padding: const EdgeInsets.only(right: 20, bottom: 20),
-              child: buildDotIndicator(1),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+
   Widget buildShopNowButton(String btnText, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
@@ -367,7 +418,7 @@ class ShopScreen extends ConsumerWidget {
               Text(
                 btnText,
                 style: const TextStyle(
-                  fontFamily: AppFonts.poppins ,
+                  fontFamily: AppFonts.poppins,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -385,6 +436,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget buildDotIndicator(int activeIndex) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -411,6 +463,7 @@ class ShopScreen extends ConsumerWidget {
       }),
     );
   }
+
   Widget _buildTrendingBrands() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -436,18 +489,18 @@ class ShopScreen extends ConsumerWidget {
                 height: 1.2),
           ),
           const SizedBox(height: 15),
+          _buildBrandItem("Amanda's Boutique",
+              "A modern designer with a youthful spirit.", AppImages.profile2),
+          _buildBrandItem("Nike", "Just do it.", AppImages.profile2),
           _buildBrandItem(
-              "Amanda's Boutique",
-              "A modern designer with a youthful spirit.",
-              AppImages.profile2),
-          _buildBrandItem("Nike", "Just do it.",
-              AppImages.profile1),
-          _buildBrandItem("Yousaf", "Wear the mood, not the label.",
-              AppImages.profile1),
+              "LOST COINS", "", AppImages.profile1),
+          _buildBrandItem(
+              "Yousaf", "Wear the mood, not the label.", AppImages.profile1),
         ],
       ),
     );
   }
+
   Widget _buildBrandItem(String title, String subtitle, String avatarUrl) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -483,17 +536,18 @@ class ShopScreen extends ConsumerWidget {
               style: TextStyle(
                   fontFamily: AppFonts.poppins,
                   fontSize: 11,
-                  fontWeight: FontWeight.w700,
+                  fontWeight: FontWeight.w500,
                   color: Color(0xFF007AFF))),
         ],
       ),
     );
   }
+
   Widget _buildCategoryTags(BuildContext context) {
     final tags = ["For You", "Men", "Women", "Jackets", "Hoodies"];
 
     return SizedBox(
-      height: 55,
+      height: 45,
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         scrollDirection: Axis.horizontal,
@@ -506,14 +560,15 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildTabItem(String label, bool isActive) {
     return Container(
       height: 40,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        color: isActive ? null : const Color(0xFF2B2B2C).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        color: isActive ? null : const Color(0xFFF1F1F1), 
         gradient: isActive
             ? const LinearGradient(
           begin: Alignment.topCenter,
@@ -521,29 +576,30 @@ class ShopScreen extends ConsumerWidget {
           colors: [Color(0xFF5AB0FF), Color(0xFF0079FF)],
         )
             : null,
-        boxShadow: isActive ? [
+        boxShadow: isActive
+            ? [
           BoxShadow(
-            color: const Color(0xFF0079FF).withValues(alpha: 0.5),
-            offset: const Offset(0, 5),
-            blurRadius: 28,
-            spreadRadius: 0,
+            color: const Color(0xFF0079FF).withValues(alpha: 0.4),
+            offset: const Offset(0, 8),
+            blurRadius: 20,
+            spreadRadius: -4,
           )
-        ] : [],
+        ]
+            : [],
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontFamily: 'Poppins',
+          fontFamily: AppFonts.poppins,
           fontSize: 14,
-          fontWeight: FontWeight.w600,
-          // Selected: White, Unselected: Dark Grey
+          fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
           color: isActive ? Colors.white : const Color(0xFF2B2B2C),
+          letterSpacing: -0.2,
         ),
       ),
     );
-  }
-  Widget _buildProductCard(
-      String imagePath, String name, String price, double height, Color bgColor) {
+  }  Widget _buildProductCard(String imagePath, String name, String price,
+      double height, Color bgColor) {
     return Container(
       height: height,
       decoration: BoxDecoration(
@@ -582,7 +638,8 @@ class ShopScreen extends ConsumerWidget {
                   ],
                 ),
               ),
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 48),
+              padding:
+                  const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 48),
               child: Row(
                 children: [
                   Container(
@@ -631,6 +688,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildPromotionSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -640,11 +698,13 @@ class ShopScreen extends ConsumerWidget {
           Expanded(
             child: Column(
               children: [
-                _buildProductCard(AppImages.teeBack, "'No Breeze' Wind Br...", "R16 999.99", 180, const Color(0xFFF5F5F5)),
+                _buildProductCard(AppImages.teeBack, "'No Breeze' Wind Br...",
+                    "R16 999.99", 180, const Color(0xFFF5F5F5)),
                 const SizedBox(height: 15),
                 _buildPromoCTA("Exclusively\non Swéy..."),
                 const SizedBox(height: 15),
-                _buildProductCard(AppImages.teeBlack, "'No Breeze' Wind Br...", "R16 999.99", 240, const Color(0xFFCCEDF3)),
+                _buildProductCard(AppImages.teeBlack, "'No Breeze' Wind Br...",
+                    "R16 999.99", 240, const Color(0xFFCCEDF3)),
                 const SizedBox(height: 15),
                 _buildPromoCTA("Grab the best!"),
               ],
@@ -654,9 +714,11 @@ class ShopScreen extends ConsumerWidget {
           Expanded(
             child: Column(
               children: [
-                _buildProductCard(AppImages.teePink, "'No Breeze' Wind Br...", "R16 999.99", 265, const Color(0xFFF5F5F5)),
+                _buildProductCard(AppImages.teePink, "'No Breeze' Wind Br...",
+                    "R16 999.99", 265, const Color(0xFFF5F5F5)),
                 const SizedBox(height: 15),
-                _buildProductCard(AppImages.teeBack, "'No Breeze' Wind Br...", "R16 999.99", 400, const Color(0xFFF5F5F5)),
+                _buildProductCard(AppImages.teeBack, "'No Breeze' Wind Br...",
+                    "R16 999.99", 400, const Color(0xFFF5F5F5)),
               ],
             ),
           ),
@@ -664,6 +726,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildPromoCTA(String text) {
     return Container(
       width: double.infinity,
@@ -696,6 +759,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildPremiumScrollSection(WidgetRef ref, ShopState state) {
     return Column(
       children: [
@@ -744,8 +808,8 @@ class ShopScreen extends ConsumerWidget {
                   state.featuredIndex == 0
                       ? "Nike - Off White Air Prestos [Virgil Abloah 2019]"
                       : state.featuredIndex == 1
-                      ? "A-H-D Oversized Tee - Black Premium Edition"
-                      : "Classic White Sneakers - Essential Collection",
+                          ? "A-H-D Oversized Tee - Black Premium Edition"
+                          : "Classic White Sneakers - Essential Collection",
                   style: const TextStyle(
                     fontFamily: AppFonts.dmSans,
                     fontSize: 14,
@@ -772,6 +836,7 @@ class ShopScreen extends ConsumerWidget {
       ],
     );
   }
+
   Widget _buildPremiumScrollItem(String imageUrl, bool isActive, int index) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -799,13 +864,16 @@ class ShopScreen extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: isDotActive ? const Color(0xFF0079FF) : Colors.white,
                     borderRadius: BorderRadius.circular(3),
-                    boxShadow: isDotActive ? [
-                      BoxShadow(
-                        color: const Color(0xFF0079FF).withValues(alpha: 0.363),
-                        offset: const Offset(0, 2),
-                        blurRadius: 7,
-                      ),
-                    ] : null,
+                    boxShadow: isDotActive
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF0079FF)
+                                  .withValues(alpha: 0.363),
+                              offset: const Offset(0, 2),
+                              blurRadius: 7,
+                            ),
+                          ]
+                        : null,
                   ),
                 );
               }),
@@ -815,6 +883,7 @@ class ShopScreen extends ConsumerWidget {
       ),
     );
   }
+
   Widget _buildGlobalScene() {
     final List<String> flags = [
       'assets/images/sk.png',
@@ -828,6 +897,7 @@ class ShopScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
             width: 140,
@@ -835,12 +905,11 @@ class ShopScreen extends ConsumerWidget {
             child: Stack(
               children: List.generate(flags.length, (index) {
                 return Positioned(
-                  left: index * 18.0,
+                  left: index * 20.0,
                   child: Container(
                     decoration: BoxDecoration(
-
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: Colors.white, width: 1),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withValues(alpha: 0.15),
@@ -860,20 +929,6 @@ class ShopScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(width: 10),
-          const Expanded(
-            child: Text(
-              "Explore the Global Scene",
-              style: TextStyle(
-                fontFamily: AppFonts.inter,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF0079FF),
-                decoration: TextDecoration.underline,
-                height: 1.0,
-              ),
-            ),
-          ),
-          const Icon(Icons.chevron_right, size: 18, color: Color(0xFF0079FF)),
         ],
       ),
     );
