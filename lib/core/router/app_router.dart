@@ -7,10 +7,8 @@ final initialAuthStateProvider = Provider<bool>((ref) {
 });
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final isLoggedIn = ref.watch(initialAuthStateProvider);
-  
   return GoRouter(
-    initialLocation: isLoggedIn ? '/home' : '/login',
+    initialLocation: '/login',
     routes: [
       GoRoute(
         path: '/login',

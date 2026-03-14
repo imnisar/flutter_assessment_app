@@ -4,8 +4,8 @@ import '../models/user_local_model.dart';
 import 'isar_service.dart';
 
 class AuthService {
-  late final FirebaseAuth _auth = FirebaseAuth.instance;
-  late final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  FirebaseAuth get _auth => FirebaseAuth.instance;
+  FirebaseFirestore get _firestore => FirebaseFirestore.instance;
   final IsarService _isarService = IsarService();
 
   Future<UserCredential> signUp({

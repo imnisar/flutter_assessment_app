@@ -6,10 +6,10 @@ class IsarService {
   late Future<Isar> db;
 
   IsarService() {
-    db = openDB();
+    db = _initDB();
   }
 
-  Future<Isar> openDB() async {
+  Future<Isar> _initDB() async {
     final dir = await getApplicationDocumentsDirectory();
     if (Isar.instanceNames.isEmpty) {
       return await Isar.open(

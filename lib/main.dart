@@ -5,25 +5,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'firebase_options.dart';
 import 'core/config/custom_screen_util.dart';
-import 'core/services/auth_service.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final results = await Future.wait([
-    Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    ),
-    authService.getLoggedUser(),
-  ]);
-
-  final bool isLoggedIn = results[1] != null;
+  
+  // Initialize in background
+  Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
-    ProviderScope(
-      overrides: [
-        initialAuthStateProvider.overrideWithValue(isLoggedIn),
-      ],
-      child: const MyApp(),
+    const ProviderScope(
+      child: MyApp(),
     ),
   );
 }
