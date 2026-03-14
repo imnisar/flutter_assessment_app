@@ -6,6 +6,7 @@ class AppImages {
   static const String profile1 = '$imagesDirectory/user_profile_1.png';
   static const String teePink = '$imagesDirectory/pink_pocket_tee.jpg';
   static const String sneakerNike = '$imagesDirectory/featured_nike.png';
+  static const String sneakerBlack = '$imagesDirectory/black_sneaker.png';
   static const String teeBlack = '$imagesDirectory/man_black_tee.png';
   static const String jacket = '$imagesDirectory/colorblock_jacket.png';
   static const String profile2 = '$imagesDirectory/user_profile_2.png';
@@ -24,6 +25,6 @@ class AppImages {
   static const String icCart = '$svgDirectory/cart.svg';
   static const String icShop = '$svgDirectory/shope.svg';
   static const String cart = '$svgDirectory/cart.svg';
-  static const String filterButton = '$svgDirectory/f=FilterButton.svg';
+  static const String filterButton = '$svgDirectory/FilterButton.svg';
   static const String search = '$svgDirectory/search.svg';
 }

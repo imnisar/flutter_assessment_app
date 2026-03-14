@@ -20,9 +20,15 @@ class IsarService {
     return Isar.getInstance()!;
   }
 
-  Future<void> saveUser(UserLocalModel newUser) async {
+  Future<void> saveUserLocally(UserLocalModel user) async {
     final isar = await db;
-    isar.writeTxnSync(() => isar.userLocalModels.putSync(newUser));
+    await isar.writeTxn(() async {
+      await isar.userLocalModels.put(user);
+    });
+  }
+
+  Future<void> saveUser(UserLocalModel newUser) async {
+    await saveUserLocally(newUser);
   }
 
   Future<UserLocalModel?> getUser() async {

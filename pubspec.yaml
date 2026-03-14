@@ -52,7 +52,14 @@ flutter:
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins-ExtraLight.ttf
+          weight: 700
+        - asset: assets/fonts/Poppins-Black.ttf
+          weight: 900
     - family:  DMSans
       fonts:
         - asset: assets/fonts/DMSans_18pt-Bold.ttf
+          weight: 700
+    - family:  inter
+      fonts:
+        - asset: assets/fonts/Inter_24pt-Bold.ttf
           weight: 700

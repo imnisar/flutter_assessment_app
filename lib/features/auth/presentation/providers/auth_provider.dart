@@ -91,6 +91,21 @@ class SignupNotifier extends StateNotifier<SignupFormState> {
       return false;
     }
   }
+
+  Future<bool> signIn() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+    try {
+      await _authService.signIn(
+        email: state.email,
+        password: state.password,
+      );
+      state = state.copyWith(isLoading: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
+      return false;
+    }
+  }
 }
 
 final authServiceProvider = Provider<AuthService>((ref) {
