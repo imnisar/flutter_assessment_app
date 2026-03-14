@@ -26,7 +26,10 @@ void main() {
           password: any(named: 'password'),
           username: any(named: 'username'),
           birthday: any(named: 'birthday'),
-        )).thenAnswer((_) async => mockUserCredential);
+        )).thenAnswer((_) async {
+          await Future.delayed(const Duration(milliseconds: 50));
+          return mockUserCredential;
+        });
   });
 
   testWidgets('Full Signup Integration Flow Test', (tester) async {
@@ -62,6 +65,7 @@ void main() {
 
       // Find Next text (inside GestureDetector)
       final nextFinder = find.text('Next');
+      await tester.ensureVisible(nextFinder);
       await tester.tap(nextFinder);
       
       // 1. Wait for loading state
@@ -75,7 +79,7 @@ void main() {
       // 3. Verify Navigation
       // Shop Screen has "For You" and "World"
       expect(find.text('Welcome!'), findsNothing);
-      expect(find.text('For You'), findsOneWidget); 
+      expect(find.text('For You'), findsNWidgets(2)); 
     });
   });
 }

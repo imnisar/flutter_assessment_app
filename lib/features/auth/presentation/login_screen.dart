@@ -16,6 +16,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool isEmailTab = true;
+  bool isLogin = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +41,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            const Text(
-              "Welcome!",
-              style: TextStyle(
+            Text(
+              isLogin ? "Welcome Back!" : "Welcome!",
+              style: const TextStyle(
                 fontFamily: AppFonts.sfPro,
                 fontWeight: FontWeight.w700,
                 fontSize: 34,
@@ -50,12 +51,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             const SizedBox(height: 15),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                "Please complete the required information, and then press the Next button",
+                isLogin
+                    ? "Please enter your credentials to login"
+                    : "Please complete the required information, and then press the Next button",
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: AppFonts.sfPro,
                   fontWeight: FontWeight.w500,
                   fontSize: 14,
@@ -83,25 +86,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               isActive: formState.isEmailValid,
               onChanged: notifier.updateEmail,
             ),
-            const SizedBox(height: 18),
-            CustomTextField(
-              label: "Username",
-              hint: "JohnApple",
-              iconPath: AppImages.icUserGrey,
-              activeIconPath: AppImages.icUserBlue,
-              isActive: formState.isUsernameValid,
-              onChanged: notifier.updateUsername,
-            ),
-            const SizedBox(height: 18),
-            CustomTextField(
-              label: "Birthday",
-              hint: "14/08/2020",
-              iconPath: AppImages.icCalGrey,
-              activeIconPath: AppImages.icCalBlue,
-              isActive: formState.isBirthdayValid,
-              onChanged: notifier.updateBirthday,
-              keyboardType: TextInputType.datetime,
-            ),
+            if (!isLogin) ...[
+              const SizedBox(height: 18),
+              CustomTextField(
+                label: "Username",
+                hint: "JohnApple",
+                iconPath: AppImages.icUserGrey,
+                activeIconPath: AppImages.icUserBlue,
+                isActive: formState.isUsernameValid,
+                onChanged: notifier.updateUsername,
+              ),
+              const SizedBox(height: 18),
+              CustomTextField(
+                label: "Birthday",
+                hint: "14/08/2020",
+                iconPath: AppImages.icCalGrey,
+                activeIconPath: AppImages.icCalBlue,
+                isActive: formState.isBirthdayValid,
+                onChanged: notifier.updateBirthday,
+                keyboardType: TextInputType.datetime,
+              ),
+            ],
             const SizedBox(height: 18),
             CustomTextField(
               label: "Password",
@@ -125,31 +130,34 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
             ),
             const SizedBox(height: 50),
-            _buildNextButton(formState, notifier),
+            _buildSubmitButton(formState, notifier),
             const SizedBox(height: 30),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: const [
-                Text(
-                  "Already have an account? ",
-                  style: TextStyle(
-                    fontFamily: AppFonts.sfPro,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF61636F),
+            GestureDetector(
+              onTap: () => setState(() => isLogin = !isLogin),
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    isLogin ? "Don't have an account? " : "Already have an account? ",
+                    style: const TextStyle(
+                      fontFamily: AppFonts.sfPro,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF61636F),
+                    ),
                   ),
-                ),
-                Text(
-                  "Signin",
-                  style: TextStyle(
-                    fontFamily: AppFonts.sfPro,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF2B2B2C),
+                  Text(
+                    isLogin ? "Signup" : "Signin",
+                    style: const TextStyle(
+                      fontFamily: AppFonts.sfPro,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2B2B2C),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 20),
           ],
@@ -187,8 +195,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     );
   }
 
-  Widget _buildNextButton(SignupFormState formState, SignupNotifier notifier) {
-    bool isValid = formState.isFormValid;
+  Widget _buildSubmitButton(SignupFormState formState, SignupNotifier notifier) {
+    bool isValid = isLogin 
+        ? (formState.isEmailValid && formState.isPasswordValid)
+        : formState.isFormValid;
+    
     bool isLoading = formState.isLoading;
 
     final Color activeColor1 = const Color(0xFF0079FF);
@@ -198,7 +209,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return GestureDetector(
       onTap: (isValid && !isLoading)
           ? () async {
-              final success = await notifier.signUp();
+              final success = isLogin ? await notifier.signIn() : await notifier.signUp();
               if (success && mounted) {
                 context.push('/home');
               } else if (formState.errorMessage != null && mounted) {
@@ -245,9 +256,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       strokeWidth: 2,
                     ),
                   )
-                : const Text(
-                    "Next",
-                    style: TextStyle(
+                : Text(
+                    isLogin ? "Login" : "Next",
+                    style: const TextStyle(
                       fontFamily: AppFonts.sfPro,
                       fontSize: 16,
                       fontWeight: FontWeight.w700,

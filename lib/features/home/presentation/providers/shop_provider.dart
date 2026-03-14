@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ShopState {
-  final int activeTabIndex; // 0 for "For You", 1 for "World"
+  final int activeTabIndex;
   final int featuredIndex;
   final double scrollOffset;
   final double pullDownPercentage;

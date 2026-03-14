@@ -3,9 +3,16 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_assessment_app/features/home/presentation/main_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 
+// This provider is overridden in main.dart with the pre-calculated state
+final initialAuthStateProvider = Provider<bool>((ref) {
+  return false; 
+});
+
 final goRouterProvider = Provider<GoRouter>((ref) {
+  final isLoggedIn = ref.watch(initialAuthStateProvider);
+  
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: isLoggedIn ? '/home' : '/login',
     routes: [
       GoRoute(
         path: '/login',
