@@ -101,7 +101,7 @@ class CustomTextField extends StatelessWidget {
                   inputFormatters: inputFormatters,
                   style: const TextStyle(
                     fontFamily: AppFonts.poppins,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w500,
                     fontSize: 12,
                     color: Color(0xFF000000),
                   ),
