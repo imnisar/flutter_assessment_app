@@ -22,4 +22,4 @@ This project is a high-performance shopping application built for a technical as
 ##  Installation
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/imnisar/flutter_assessment_app.git](https://github.com/imnisar/flutter_assessment_app.git)
+   git clone [https://github.com/imnisar/flutter_assessment_app/tree/Develope)

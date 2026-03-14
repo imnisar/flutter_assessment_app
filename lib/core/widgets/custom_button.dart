@@ -20,7 +20,7 @@ class CustomButton extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF0079FF).withOpacity(0.4),
+            color: const Color(0xFF0079FF).withValues(alpha: 0.4),
             blurRadius: 30,
             offset: const Offset(0, 15),
             spreadRadius: -10,
