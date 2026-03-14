@@ -34,9 +34,6 @@ class ShopScreen extends ConsumerWidget {
               return true;
             },
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(
-                parent: AlwaysScrollableScrollPhysics(),
-              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -47,7 +44,7 @@ class ShopScreen extends ConsumerWidget {
                    SizedBox(height: 60.h
                   ),
                   _buildFeaturedSection(ref, state),
-                  const SizedBox(height: 0),
+                   SizedBox(height: 10.h),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -60,10 +57,11 @@ class ShopScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 5),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: MasonryGridView.count(
+                      padding: EdgeInsets.zero,
                       crossAxisCount: 2,
                       mainAxisSpacing: 15,
                       crossAxisSpacing: 15,
@@ -100,12 +98,13 @@ class ShopScreen extends ConsumerWidget {
                       },
                     ),
                   ),
+                  SizedBox(height: 20.h,),
                   _buildPremiumScrollSection(
                     ref,
                     state,
                   ),
                   SizedBox(
-                    height: 8.h,
+                    height: 12.h,
                   ),
                   _buildPromotionSection(),
                   const SizedBox(height: 70),
@@ -146,7 +145,7 @@ class ShopScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 55),
+                 SizedBox(height: 75.h),
                 _buildSearchBar(context, ref, state),
                 if (!state.isSearchActive) ...[
                   ClipRect(
@@ -348,7 +347,7 @@ class ShopScreen extends ConsumerWidget {
 
   Widget _buildFeaturedSection(WidgetRef ref, ShopState state) {
     return SizedBox(
-      height: 425.h,
+      height: 405.h,
       child: PageView(
         onPageChanged: ref.read(shopProvider.notifier).setFeaturedIndex,
         children: [
@@ -409,7 +408,7 @@ class ShopScreen extends ConsumerWidget {
             ),
             SizedBox(height: 12.h),
             buildShopNowButton("Shop Now", () {}),
-            SizedBox(height: 8.h),
+            SizedBox(height: 4.h),
             Align(
               alignment: Alignment.centerRight,
               child: buildDotIndicator(
@@ -603,7 +602,7 @@ class ShopScreen extends ConsumerWidget {
   }
 
   Widget _buildCategoryTags(BuildContext context) {
-    final tags = ["For You", "Men", "Women", "Jackets", "Hoodies"];
+    final tags = ["For You", "Men", "Women", "Jackets",];
 
     return SizedBox(
       height: 45,
