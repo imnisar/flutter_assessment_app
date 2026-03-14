@@ -388,7 +388,7 @@ class ShopScreen extends ConsumerWidget {
   Widget buildDotIndicator(int activeIndex) {
     return Row(
       mainAxisSize: MainAxisSize.min,
-      children: List.generate(2, (index) {
+      children: List.generate(3, (index) {
         final bool isActive = index == activeIndex;
         return Container(
           margin: const EdgeInsets.only(left: 4),
@@ -817,12 +817,12 @@ class ShopScreen extends ConsumerWidget {
   }
   Widget _buildGlobalScene() {
     final List<String> flags = [
-      'assets/flags/sk.png',
-      'assets/flags/br.png',
-      'assets/flags/en.png',
-      'assets/flags/mg.png',
-      'assets/flags/us.png',
-      'assets/flags/sa.png',
+      'assets/images/sk.png',
+      'assets/images/br.png',
+      'assets/images/en.png',
+      'assets/images/mg.png',
+      'assets/images/us.png',
+      'assets/images/sa.png',
     ];
 
     return Padding(
@@ -838,6 +838,7 @@ class ShopScreen extends ConsumerWidget {
                   left: index * 18.0,
                   child: Container(
                     decoration: BoxDecoration(
+
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                       boxShadow: [
