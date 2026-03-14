@@ -15,8 +15,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   final List<Widget> _screens = [
     const ShopScreen(),
-    const Center(child: Text("Cart Screen", style: TextStyle(fontSize: 24))),
-    const Center(child: Text("Profile Screen", style: TextStyle(fontSize: 24))),
+    const Center(child: Text("This feature is currently in progress.", style: TextStyle(fontSize: 24))),
+    const Center(child: Text("Profile functionality is currently under development.", style: TextStyle(fontSize: 24))),
   ];
 
   @override

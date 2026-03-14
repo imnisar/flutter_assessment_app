@@ -44,11 +44,10 @@ class ShopScreen extends ConsumerWidget {
                     height: 70.h,
                   ),
                   _buildTabs(context, ref, state),
-                  SizedBox(
-                    height: 40.h,
+                   SizedBox(height: 60.h
                   ),
                   _buildFeaturedSection(ref, state),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 0),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
@@ -61,7 +60,7 @@ class ShopScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 5),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: MasonryGridView.count(
@@ -127,35 +126,56 @@ class ShopScreen extends ConsumerWidget {
 
   Widget _buildGlassHeader(
       BuildContext context, WidgetRef ref, ShopState state) {
-    return SafeArea(
-      bottom: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 65),
-          _buildSearchBar(context),
-          ClipRect(
-            child: AnimatedAlign(
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.easeOutQuart,
-              alignment: Alignment.topCenter,
-              heightFactor:
-                  (state.isTagsVisible ? 1.0 : state.pullDownPercentage)
-                      .clamp(0.0, 1.0),
-              child: Opacity(
-                opacity: (state.isTagsVisible ? 1.0 : state.pullDownPercentage)
-                    .clamp(0.0, 1.0),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 15),
-                    _buildCategoryTags(context),
-                  ],
-                ),
-              ),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
+      height: state.isSearchActive ? MediaQuery.of(context).size.height : null,
+      decoration: BoxDecoration(
+        color: state.isSearchActive
+            ? Colors.white.withValues(alpha: 0.4)
+            : Colors.transparent,
+      ),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+            sigmaX: state.isSearchActive ? 15 : 0,
+            sigmaY: state.isSearchActive ? 15 : 0,
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 55),
+                _buildSearchBar(context, ref, state),
+                if (!state.isSearchActive) ...[
+                  ClipRect(
+                    child: AnimatedAlign(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeOutQuart,
+                      alignment: Alignment.topCenter,
+                      heightFactor:
+                          (state.isTagsVisible ? 1.0 : state.pullDownPercentage)
+                              .clamp(0.0, 1.0),
+                      child: Opacity(
+                        opacity: (state.isTagsVisible
+                                ? 1.0
+                                : state.pullDownPercentage)
+                            .clamp(0.0, 1.0),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 15),
+                            _buildCategoryTags(context),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
-          const SizedBox(height: 20),
-        ],
+        ),
       ),
     );
   }
@@ -248,48 +268,87 @@ class ShopScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSearchBar(BuildContext context) {
+  Widget _buildSearchBar(BuildContext context, WidgetRef ref, ShopState state) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        height: 46,
-        decoration: BoxDecoration(
-          color: const Color(0xFFF3F3F3),
-          borderRadius: BorderRadius.circular(23),
-        ),
-        child: Row(
-          children: [
+      child: Row(
+        children: [
+          Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 400),
+              height: 46,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3F3F3).withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(23),
+                boxShadow: state.isSearchActive
+                  ? [const BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))]
+                  : [],
+              ),
+              child: Row(
+                children: [
+                  const SizedBox(width: 15),
+                  const Icon(Icons.search, color: Color(0xFF8E8E93), size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      autofocus: state.isSearchActive,
+                      onTap: () {
+                        if (!state.isSearchActive) {
+                          ref.read(shopProvider.notifier).setSearchActive(true);
+                        }
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Search your product...",
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 12),
+                        hintStyle: TextStyle(
+                          fontFamily: AppFonts.poppins,
+                          fontSize: 14,
+                          color: Color(0xFF8E8E93),
+                        ),
+                      ),
+                    ),
+                  ),
+                  if (!state.isSearchActive)
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        AppImages.filterButton,
+                        width: 20,
+                        height: 20,
+                      ),
+                      onPressed: () {},
+                    ),
+                ],
+              ),
+            ),
+          ),
+          if (state.isSearchActive) ...[
             const SizedBox(width: 15),
-            SvgPicture.asset(AppImages.search,
-                width: 18,
-                colorFilter:
-                    const ColorFilter.mode(Color(0xFFB0B0B0), BlendMode.srcIn)),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: "Search your product...",
-                  hintStyle: TextStyle(
-                      fontFamily: AppFonts.poppins,
-                      fontSize: 12,
-                      color: Color(0xFF9C9898),
-                      fontWeight: FontWeight.w500),
-                  border: InputBorder.none,
-                  isDense: true,
+            GestureDetector(
+              onTap: () {
+                ref.read(shopProvider.notifier).setSearchActive(false);
+                FocusScope.of(context).unfocus();
+              },
+              child: const Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Color(0xFF007AFF),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontFamily: AppFonts.inter,
                 ),
               ),
             ),
-            SvgPicture.asset(AppImages.filterButton, width: 22),
-            const SizedBox(width: 12),
           ],
-        ),
+        ],
       ),
     );
   }
 
   Widget _buildFeaturedSection(WidgetRef ref, ShopState state) {
     return SizedBox(
-      height: 500.h,
+      height: 425.h,
       child: PageView(
         onPageChanged: ref.read(shopProvider.notifier).setFeaturedIndex,
         children: [
@@ -311,7 +370,7 @@ class ShopScreen extends ConsumerWidget {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -348,9 +407,9 @@ class ShopScreen extends ConsumerWidget {
                 color: Color(0xFF3F3636),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 12.h),
             buildShopNowButton("Shop Now", () {}),
-            SizedBox(height: 10.h),
+            SizedBox(height: 8.h),
             Align(
               alignment: Alignment.centerRight,
               child: buildDotIndicator(
@@ -369,13 +428,13 @@ class ShopScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildTrendingBrands(),
-          const SizedBox(height: 15),
+          const SizedBox(height: 10),
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(child: _buildGlobalScene()),
               Padding(
-                padding: const EdgeInsets.only(right: 20, bottom: 20),
+                padding: const EdgeInsets.only(right: 20, bottom: 5),
                 child: buildDotIndicator(1),
               ),
             ],

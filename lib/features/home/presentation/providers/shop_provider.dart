@@ -6,13 +6,15 @@ class ShopState {
   final double scrollOffset;
   final double pullDownPercentage;
   final bool isTagsVisible;
+  final bool isSearchActive;
 
   const ShopState({
     this.activeTabIndex = 0,
     this.featuredIndex = 0,
     this.scrollOffset = 0,
-    this.pullDownPercentage = 0,
+    this.pullDownPercentage = 0.0,
     this.isTagsVisible = false,
+    this.isSearchActive = false,
   });
 
   ShopState copyWith({
@@ -21,6 +23,7 @@ class ShopState {
     double? scrollOffset,
     double? pullDownPercentage,
     bool? isTagsVisible,
+    bool? isSearchActive,
   }) {
     return ShopState(
       activeTabIndex: activeTabIndex ?? this.activeTabIndex,
@@ -28,6 +31,7 @@ class ShopState {
       scrollOffset: scrollOffset ?? this.scrollOffset,
       pullDownPercentage: pullDownPercentage ?? this.pullDownPercentage,
       isTagsVisible: isTagsVisible ?? this.isTagsVisible,
+      isSearchActive: isSearchActive ?? this.isSearchActive,
     );
   }
 }
@@ -58,6 +62,9 @@ class ShopNotifier extends StateNotifier<ShopState> {
 
   void setPullDown(double percentage) =>
       state = state.copyWith(pullDownPercentage: percentage);
+
+  void setSearchActive(bool active) =>
+      state = state.copyWith(isSearchActive: active);
 }
 
 final shopProvider = StateNotifierProvider<ShopNotifier, ShopState>((ref) {
