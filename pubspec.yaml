@@ -63,3 +63,9 @@ flutter:
       fonts:
         - asset: assets/fonts/Inter_24pt-Bold.ttf
           weight: 700
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/sssLogo.jpeg"
+  min_sdk_android: 21
